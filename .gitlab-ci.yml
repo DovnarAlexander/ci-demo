@@ -1,6 +1,6 @@
 ---
 
-image: python:3.10.4
+image: python:3.13
 
 stages:
   - build
@@ -9,13 +9,15 @@ stages:
 Build and Test:
   stage: build
   script:
-    - pip install -r requirements.txt
+    - pip install uv
+    - uv sync
     - ls -la
-    - python hello-world.py
+    - uv run python hello-world.py
     - echo "The code is okay"
 
 lint:
   stage: lint
   script:
-    - pip install -r requirements.txt
-    - flake8 . --extend-exclude=dist,build --show-source --statistics
+    - pip install uv
+    - uv sync
+    - uv run flake8 . --exclude=.git,.venv --show-source --statistics

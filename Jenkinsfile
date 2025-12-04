@@ -1,33 +1,34 @@
 pipeline {
   agent any
+    environment {
+      PATH = "/root/.local/bin:${env.PATH}"
+    }
   stages {
-    // Мы используем тут master агента, что очень плохо в реальных проектах
-    // Для демо целей - это позволительно, поэтому надо сюда установить python
+    // Используем Docker агенты вместо master агента
     stage('Preparation') {
       steps {
         sh """
-          apt update
-          apt install -y python3 python3-pip
-          ln -s /usr/bin/python3 /usr/bin/python
+          apt-get update
+          apt-get install -y python3 python3-pip
+          ln -s /usr/bin/python3 /usr/bin/python || echo "Existing symlink"
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          python --version
+          uv sync
         """
       }
     }
     stage('Build and Test') {
       steps {
         sh """
-          pip install -r requirements.txt
           ls -la
-          python hello-world.py
+          uv run python hello-world.py
           echo "The code is okay"
         """
       }
     }
     stage('Lint') {
       steps {
-        sh """
-          pip install -r requirements.txt
-          flake8 . --extend-exclude=dist,build --show-source --statistics
-        """
+        sh "uv run flake8 . --exclude=.git,.venv --show-source --statistics"
       }
     }
   }

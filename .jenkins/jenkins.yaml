@@ -1,0 +1,34 @@
+jenkins:
+  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n"
+  numExecutors: 2
+  mode: NORMAL
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "admin"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+jobs:
+  - script: >
+      multibranchPipelineJob('ci-demo') {
+        displayName('CI Demo Pipeline')
+        branchSources {
+          git {
+            id('ci-demo-git')
+            remote('https://github.com/DovnarAlexander/ci-demo.git')
+          }
+        }
+        orphanedItemStrategy {
+          discardOldItems {
+            numToKeep(20)
+          }
+        }
+      }
+
+unclassified:
+  location:
+    url: "http://localhost:8080/"

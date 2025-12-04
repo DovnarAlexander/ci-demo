@@ -6,26 +6,33 @@ on: push
 jobs:
   build-and-test:
     name: Build and Test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v6
         with:
-          python-version: '3.9'
-          cache: 'pip'
-      - run: pip install -r requirements.txt
-      - run: | 
+          python-version: '3.13'
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.4.4"
+          enable-cache: true
+      - run: |
+          uv sync
           ls -la
-          python hello-world.py
+          uv run hello-world.py
           echo "The code is okay"
   lint:
     name: Lint Code
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v6
         with:
-          python-version: '3.9'
-          cache: 'pip'
-      - run: pip install -r requirements.txt 
-      - run: flake8 . --extend-exclude=dist,build --show-source --statistics
+          python-version: '3.13'
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.4.4"
+          enable-cache: true
+      - run: |
+          uv sync
+          uv run flake8 . --exclude=.git,.venv --show-source --statistics

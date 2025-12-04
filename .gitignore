@@ -1,2 +1,6 @@
 # Python
 venv
+# Local env
+.env
+# CI/CD Cleanup Scripts
+.gc/
